@@ -3,8 +3,6 @@ import yaml
 import json
 import datetime
 
-#check if theres a json file named today's date already
-# if not, create one
 today = datetime.date.today()
 filename = today.strftime('%Y-%m-%d') + '.json'
 
@@ -21,7 +19,7 @@ def accessJSONFile():
 
 accessJSONFile()
 
-name = "Nancy Pelosi"
+name = "Mike Levin"
 def getData(name):
     with open(filename, 'r') as f:
         data = json.load(f)
@@ -30,15 +28,15 @@ def getData(name):
                 try:
                     phonenumber =  i['terms'][0]['phone']
                 except:
-                    phonenumber = "N/A"
+                    phonenumber = "None"
                 try:
                     opensecrets = i['id']['opensecrets']
                 except:
-                    phonenumber = "N/A"
+                    phonenumber = "None"
                 try:
                     address = i['terms'][0]['address']
                 except:
-                    address = "N/A"
+                    address = "None"
                 return phonenumber, opensecrets, address
 
 def getFromCandidates(name):
