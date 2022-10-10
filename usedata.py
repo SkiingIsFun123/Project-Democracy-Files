@@ -9,24 +9,62 @@ with open('legislators-current.json', 'w') as f:
     json.dump(data, f, indent=2)
 
 name = "Mike Levin"
-def getPhoneNumber(name):
+def getData(name):
     with open('legislators-current.json', 'r') as f:
         data = json.load(f)
         for i in data:
             if i['name']['official_full'] == name:
-                return i['terms'][0]['phone']
+                phonenumber =  i['terms'][0]['phone']
+                opensecrets = i['id']['opensecrets']
+                address = i['terms'][0]['address']
+                return phonenumber, opensecrets, address
 
-def getIds(name):
+def getFromCandidates(name):
     with open('candidates.json', 'r') as f:
         data = json.load(f)
         for candidateName in data:
             if candidateName == name:
                 feccandid = data[candidateName][3]
-                cid = data[candidateName][0]
-                return feccandid, cid
+                return feccandid
             else:
                 pass
 
-print(getPhoneNumber(name))
-print(getIds(name)[0])
-print(getIds(name)[1])
+candidateData = getFromCandidates(name)
+legislatorData = getData(name)
+
+print(candidateData)
+print(legislatorData[0])
+print(legislatorData[1])
+print(legislatorData[2])
+
+def getOrganizations(cid):
+    url = 'https://www.opensecrets.org/api/?method=candContrib&cid=' + cid + '&cycle=2022&apikey=c5d1d02a93919b2845a095e52c2af67a&output=json'
+    response = requests.get(url)
+    data = response.text
+    jsonData = json.loads(data)
+    orgs = {}
+    for i in jsonData['response']['contributors']['contributor']:
+        org = i['@attributes']['org_name']
+        total = i['@attributes']['total']
+        orgs[org] = total
+    return orgs
+
+def getSectors(cid):
+    url = 'https://www.opensecrets.org/api/?method=candSector&cid=' + cid + '&cycle=2022&apikey=c5d1d02a93919b2845a095e52c2af67a&output=json'
+    response = requests.get(url)
+    data = response.text
+    jsonData = json.loads(data)
+    sectors = {}
+    for i in jsonData['response']['sectors']['sector']:
+        sector = i['@attributes']['sector_name']
+        total = i['@attributes']['total']
+        sectors[sector] = total
+    return sectors
+
+candidateID = legislatorData[1]
+
+topsupporters = getOrganizations(candidateID)
+print(topsupporters)
+
+topsectors = getSectors(candidateID)
+print(topsectors)
