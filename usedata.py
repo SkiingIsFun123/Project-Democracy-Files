@@ -1,22 +1,44 @@
 import requests
 import yaml
 import json
+import datetime
 
-url = 'https://raw.githubusercontent.com/unitedstates/congress-legislators/main/legislators-current.yaml'
-response = requests.get(url)
-data = yaml.safe_load(response.text)
-with open('legislators-current.json', 'w') as f:
-    json.dump(data, f, indent=2)
+#check if theres a json file named today's date already
+# if not, create one
+today = datetime.date.today()
+filename = today.strftime('%Y-%m-%d') + '.json'
 
-name = "Mike Levin"
+def accessJSONFile():
+    try:
+        with open(filename, 'r') as f:
+            pass
+    except:
+        url = 'https://raw.githubusercontent.com/unitedstates/congress-legislators/main/legislators-current.yaml'
+        response = requests.get(url)
+        data = yaml.safe_load(response.text)
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=2)
+
+accessJSONFile()
+
+name = "Nancy Pelosi"
 def getData(name):
-    with open('legislators-current.json', 'r') as f:
+    with open(filename, 'r') as f:
         data = json.load(f)
         for i in data:
             if i['name']['official_full'] == name:
-                phonenumber =  i['terms'][0]['phone']
-                opensecrets = i['id']['opensecrets']
-                address = i['terms'][0]['address']
+                try:
+                    phonenumber =  i['terms'][0]['phone']
+                except:
+                    phonenumber = "N/A"
+                try:
+                    opensecrets = i['id']['opensecrets']
+                except:
+                    phonenumber = "N/A"
+                try:
+                    address = i['terms'][0]['address']
+                except:
+                    address = "N/A"
                 return phonenumber, opensecrets, address
 
 def getFromCandidates(name):
